@@ -1,0 +1,32 @@
+
+
+name: Dart
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Checkout
+        uses: actions/checkout@v4
+
+      - name: ✨ Setup FVM
+        uses: kuhnroyal/flutter-fvm-config-action@v1
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+          cache-key: flutter-cache-${{ env.FLUTTER_VERSION }}${{ env.FLUTTER_CHANNEL }}
+            
+      - name: 🕵️ Analyze
+        run: flutter analyze
+
+      - name: 🧪 Test
+        run: flutter test --coverage
