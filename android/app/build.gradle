@@ -1,0 +1,110 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0"
+}
+
+android {
+    namespace = "br.com.market4u.pos.digital.flutter_pos_digital"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId = "br.com.market4u.pos.digital"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdk = flutter.compileSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
+    }
+
+    signingConfigs{
+        prod {}
+        dev {}
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            signingConfig = signingConfigs.prod
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+        }
+    }
+
+    flavorDimensions "default"
+
+    productFlavors{
+        prod {
+            resValue "string", "app_name", "market4u POS"
+        }
+        dev {
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "m4u POS Beta"
+        }
+        minApi21{
+            initWith prod
+            minSdk = 21
+        }
+        minApi23{
+            initWith prod
+            minSdk = 23
+        }
+
+        minApi21Dev{
+            initWith dev
+            minSdk = 21
+        }
+        minApi23Dev{
+            initWith dev
+            minSdk = 21
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+android.applicationVariants.all { variant ->
+    variant.assemble.doLast {
+        println "\n===== CONFIGURAÇÃO FINAL DO BUILD ====="
+        println "Flavor: ${variant.flavorName}"
+        println "Build Type: ${variant.buildType.name}"
+        println "Application ID: ${variant.applicationId}"
+        println "Version Code: ${variant.versionCode}"
+        println "Version Name: ${variant.versionName}"
+        println "Min SDK Version: ${variant.mergedFlavor.minSdkVersion.apiLevel}"
+        println "Target SDK Version: ${variant.mergedFlavor.targetSdkVersion.apiLevel}"
+        println "\n"
+    }
+}
